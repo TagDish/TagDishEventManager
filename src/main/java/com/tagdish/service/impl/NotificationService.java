@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -33,6 +34,7 @@ public class NotificationService extends CommonService implements INotificationS
 	@Autowired
     private NotificationDAO notificationDAO;
 		
+	@Async
 	public void notify(String notifyJson, Boolean isList) throws TagDishServiceException {
 		
 		logger.debug("NotificationService - notify() - start");

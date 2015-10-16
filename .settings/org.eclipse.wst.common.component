@@ -6,6 +6,6 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/webapp"/>
         <property name="java-output-path" value="/TagDishService/build/classes"/>
-        <property name="context-root" value="TagDish"/>
+        <property name="context-root" value="TagDishService"/>
     </wb-module>
 </project-modules>
