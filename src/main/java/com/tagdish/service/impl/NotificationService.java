@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.tagdish.constant.TagDishServiceConstant;
+import com.tagdish.constant.TagDishDomainConstant;
 import com.tagdish.dao.jdbc.NotificationDAO;
 import com.tagdish.domain.db.NotificationDB;
 import com.tagdish.domain.dto.NotificationDTO;
@@ -68,7 +68,7 @@ public class NotificationService extends CommonService implements INotificationS
 		notificationDBList = notificationDAO.getNotificationList(notificationDB);
 		if(notificationDBList == null || notificationDBList.size() == 0) {
 			
-			notificationDAO.saveNotification(notificationDB);
+			notificationDAO.createNotification(notificationDB);
 		} else {
 			
 			notificationDB = notificationDBList.get(0);
@@ -96,12 +96,13 @@ public class NotificationService extends CommonService implements INotificationS
 		String data = null;
 		
 		if(notificationDTO.getAction() != null) {
-			if(notificationDTO.getAction().equalsIgnoreCase(TagDishServiceConstant.CALL_RESTAURANT_NOTIFY_TYPE)
-					|| notificationDTO.getAction().equalsIgnoreCase(TagDishServiceConstant.VIEW_RESTAURANT_DETAIL_NOTIFY_TYPE)
-					|| notificationDTO.getAction().equalsIgnoreCase(TagDishServiceConstant.VIEW_DISH_DETAIL_NOTIFY_TYPE)
-					|| notificationDTO.getAction().equalsIgnoreCase(TagDishServiceConstant.VIEW_DIRECTION_RESTAURANT_NOTIFY_TYPE)) {
+			if(notificationDTO.getAction().equalsIgnoreCase(TagDishDomainConstant.CALL_RESTAURANT_NOTIFY_TYPE)
+					|| notificationDTO.getAction().equalsIgnoreCase(TagDishDomainConstant.VIEW_RESTAURANT_DETAIL_NOTIFY_TYPE)
+					|| notificationDTO.getAction().equalsIgnoreCase(TagDishDomainConstant.VIEW_DISH_DETAIL_NOTIFY_TYPE)
+					|| notificationDTO.getAction().equalsIgnoreCase(TagDishDomainConstant.VIEW_DIRECTION_RESTAURANT_NOTIFY_TYPE)) {
 				data = notificationDTO.getEntityId();
-			} else if(notificationDTO.getAction().equalsIgnoreCase(TagDishServiceConstant.SEARCH_NOTIFY_TYPE)) {
+			} else if(notificationDTO.getAction().equalsIgnoreCase(TagDishDomainConstant.SEARCH_NOTIFY_TYPE) ||
+					notificationDTO.getAction().equalsIgnoreCase(TagDishDomainConstant.MORE_RESULTS_NOTIFY_TYPE)) {
 				data = gson.toJson(notificationDTO.getSearchInputDTO());
 			}			
 		}
