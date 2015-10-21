@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,9 @@ public class NotificationService extends CommonService implements INotificationS
 	
 	@Autowired
     private NotificationDAO notificationDAO;
+	
+	@Value("${save.search.result}")
+	private boolean saveSearchResult;
 		
 	@Async
 	public void notify(String notifyJson, Boolean isList) throws TagDishServiceException {
@@ -75,13 +79,34 @@ public class NotificationService extends CommonService implements INotificationS
 			notificationDB.setCount(notificationDB.getCount() + 1);
 			notificationDB.setTimestamp(notificationDTO.getTimestamp());
 			notificationDAO.updateNotification(notificationDB);
-		}		
+		}
+		
+		if(TagDishDomainConstant.SEARCH_NOTIFY_TYPE.equalsIgnoreCase(notificationDTO.getAction())) {
+			saveSearchResult(notificationDB, notificationDTO);	
+		}
+	}
+	
+	private void saveSearchResult(NotificationDB notificationDB, NotificationDTO notificationDTO) {
+		
+		String searchResult = null;
+		List<NotificationDB> notificationDBList = null;
+		if(saveSearchResult) {
+			searchResult = getSearchResultString(notificationDTO);
+			
+			if(notificationDB.getNotificationId() == null) {
+				notificationDBList = notificationDAO.getNotificationList(notificationDB);
+				notificationDAO.createSearchResultLog(notificationDBList.get(0).getNotificationId(), searchResult);
+			} else {
+				notificationDAO.createSearchResultLog(notificationDB.getNotificationId(), searchResult);
+			}
+		}
 	}
 
 	private String getSearchResultString(NotificationDTO notificationDTO) {
 		
 		SearchResultDTO searchResultDTO = notificationDTO.getSearchResultDTO();
 		StringBuffer searchResult = new StringBuffer();
+		String resultString = null;
 		if(searchResultDTO != null &&
 				searchResultDTO.getDishRestaurantList() != null &&
 				searchResultDTO.getDishRestaurantList().size() > 0){
@@ -89,7 +114,12 @@ public class NotificationService extends CommonService implements INotificationS
 				searchResult.append(restaurantDishDTO.getDishDTO().getDishId() + ",");
 			}
 		}
-		return searchResult.toString();
+		if(searchResult.length() > 1000) {
+			resultString = searchResult.toString().substring(0, 1000);
+		} else {
+			resultString = searchResult.toString();
+		}
+		return resultString;
 	}
 	
 	private String getData(NotificationDTO notificationDTO) {
